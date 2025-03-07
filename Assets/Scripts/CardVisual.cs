@@ -109,14 +109,14 @@ public class CardVisual : MonoBehaviour
 
     private void HandPositioning()
     {
-        curveYOffset = (curve.positioning.Evaluate(parentCard.NormalizedPosition()) * curve.positioningInfluence) * parentCard.SiblingAmount();
+        curveYOffset = curve.positioning.Evaluate(parentCard.NormalizedPosition()) * curve.positioningInfluence * parentCard.SiblingAmount();
         curveYOffset = parentCard.SiblingAmount() < 5 ? 0 : curveYOffset;
         curveRotationOffset = curve.rotation.Evaluate(parentCard.NormalizedPosition());
     }
 
     private void SmoothFollow()
     {
-        Vector3 verticalOffset = (Vector3.up * (parentCard.isDragging ? 0 : curveYOffset));
+        Vector3 verticalOffset = Vector3.up * (parentCard.isDragging ? 0 : curveYOffset);
         transform.position = Vector3.Lerp(transform.position, cardTransform.position + verticalOffset, followSpeed * Time.deltaTime);
     }
 
@@ -132,16 +132,14 @@ public class CardVisual : MonoBehaviour
     private void CardTilt()
     {
         savedIndex = parentCard.isDragging ? savedIndex : parentCard.ParentIndex();
-        float sine = Mathf.Sin(Time.time + savedIndex) * (parentCard.isHovering ? .2f : 1);
-        float cosine = Mathf.Cos(Time.time + savedIndex) * (parentCard.isHovering ? .2f : 1);
 
         Vector3 offset = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
         float tiltX = parentCard.isHovering ? ((offset.y * -1) * manualTiltAmount) : 0;
-        float tiltY = parentCard.isHovering ? ((offset.x) * manualTiltAmount) : 0;
+        float tiltY = parentCard.isHovering ? (offset.x * manualTiltAmount) : 0;
         float tiltZ = parentCard.isDragging ? tiltParent.eulerAngles.z : (curveRotationOffset * (curve.rotationInfluence * parentCard.SiblingAmount()));
 
-        float lerpX = Mathf.LerpAngle(tiltParent.eulerAngles.x, tiltX + (sine * autoTiltAmount), tiltSpeed * Time.deltaTime);
-        float lerpY = Mathf.LerpAngle(tiltParent.eulerAngles.y, tiltY + (cosine * autoTiltAmount), tiltSpeed * Time.deltaTime);
+        float lerpX = Mathf.LerpAngle(tiltParent.eulerAngles.x, tiltX, tiltSpeed * Time.deltaTime);
+        float lerpY = Mathf.LerpAngle(tiltParent.eulerAngles.y, tiltY, tiltSpeed * Time.deltaTime);
         float lerpZ = Mathf.LerpAngle(tiltParent.eulerAngles.z, tiltZ, tiltSpeed / 2 * Time.deltaTime);
 
         tiltParent.eulerAngles = new Vector3(lerpX, lerpY, lerpZ);
@@ -152,9 +150,9 @@ public class CardVisual : MonoBehaviour
         DOTween.Kill(2, true);
         float dir = state ? 1 : 0;
         shakeParent.DOPunchPosition(shakeParent.up * selectPunchAmount * dir, scaleTransition, 10, 1);
-        shakeParent.DOPunchRotation(Vector3.forward * (hoverPunchAngle/2), hoverTransition, 20, 1).SetId(2);
+        shakeParent.DOPunchRotation(Vector3.forward * (hoverPunchAngle / 2), hoverTransition, 20, 1).SetId(2);
 
-        if(scaleAnimations)
+        if (scaleAnimations)
             transform.DOScale(scaleOnHover, scaleTransition).SetEase(scaleEase);
 
     }
@@ -170,7 +168,7 @@ public class CardVisual : MonoBehaviour
 
     private void BeginDrag(Card card)
     {
-        if(scaleAnimations)
+        if (scaleAnimations)
             transform.DOScale(scaleOnSelect, scaleTransition).SetEase(scaleEase);
 
         canvas.overrideSorting = true;
@@ -184,7 +182,7 @@ public class CardVisual : MonoBehaviour
 
     private void PointerEnter(Card card)
     {
-        if(scaleAnimations)
+        if (scaleAnimations)
             transform.DOScale(scaleOnHover, scaleTransition).SetEase(scaleEase);
 
         DOTween.Kill(2, true);
@@ -199,7 +197,7 @@ public class CardVisual : MonoBehaviour
 
     private void PointerUp(Card card, bool longPress)
     {
-        if(scaleAnimations)
+        if (scaleAnimations)
             transform.DOScale(longPress ? scaleOnHover : scaleOnSelect, scaleTransition).SetEase(scaleEase);
         canvas.overrideSorting = false;
 
@@ -209,9 +207,9 @@ public class CardVisual : MonoBehaviour
 
     private void PointerDown(Card card)
     {
-        if(scaleAnimations)
+        if (scaleAnimations)
             transform.DOScale(scaleOnSelect, scaleTransition).SetEase(scaleEase);
-            
+
         visualShadow.localPosition += (-Vector3.up * shadowOffset);
         shadowCanvas.overrideSorting = false;
     }
