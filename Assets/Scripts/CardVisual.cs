@@ -152,6 +152,8 @@ public class CardVisual : MonoBehaviour
         shakeParent.DOPunchPosition(shakeParent.up * selectPunchAmount * dir, scaleTransition, 10, 1);
         shakeParent.DOPunchRotation(Vector3.forward * (hoverPunchAngle / 2), hoverTransition, 20, 1).SetId(2);
 
+        canvas.overrideSorting = state;
+
         if (scaleAnimations)
             transform.DOScale(scaleOnHover, scaleTransition).SetEase(scaleEase);
 
@@ -172,11 +174,14 @@ public class CardVisual : MonoBehaviour
             transform.DOScale(scaleOnSelect, scaleTransition).SetEase(scaleEase);
 
         canvas.overrideSorting = true;
+
     }
 
     private void EndDrag(Card card)
     {
-        canvas.overrideSorting = false;
+        if (!card.selected)
+            canvas.overrideSorting = false;
+
         transform.DOScale(1, scaleTransition).SetEase(scaleEase);
     }
 
@@ -199,7 +204,8 @@ public class CardVisual : MonoBehaviour
     {
         if (scaleAnimations)
             transform.DOScale(longPress ? scaleOnHover : scaleOnSelect, scaleTransition).SetEase(scaleEase);
-        canvas.overrideSorting = false;
+        if (!card.selected)
+            canvas.overrideSorting = false;
 
         visualShadow.localPosition = shadowDistance;
         shadowCanvas.overrideSorting = true;

@@ -19,7 +19,6 @@ public class HorizontalCardHolder : MonoBehaviour
     [SerializeField] private int cardsToSpawn = 7;
     public List<Card> cards;
 
-    bool isCrossing = false;
     [SerializeField] private bool tweenCardReturn = true;
 
     void Start()
@@ -68,10 +67,7 @@ public class HorizontalCardHolder : MonoBehaviour
         if (selectedCard == null)
             return;
 
-        selectedCard.transform.DOLocalMove(selectedCard.selected ? new Vector3(0,selectedCard.selectionOffset,0) : Vector3.zero, tweenCardReturn ? .15f : 0).SetEase(Ease.OutBack);
-
-        rect.sizeDelta += Vector2.right;
-        rect.sizeDelta -= Vector2.right;
+        selectedCard.transform.DOLocalMove(selectedCard.selected ? new Vector3(0, selectedCard.selectionOffset, 0) : Vector3.zero, tweenCardReturn ? .15f : 0).SetEase(Ease.OutBack);
 
         selectedCard = null;
 
@@ -110,8 +106,7 @@ public class HorizontalCardHolder : MonoBehaviour
         if (selectedCard == null)
             return;
 
-        if (isCrossing)
-            return;
+
 
         for (int i = 0; i < cards.Count; i++)
         {
@@ -138,7 +133,6 @@ public class HorizontalCardHolder : MonoBehaviour
 
     void Swap(int index)
     {
-        isCrossing = true;
 
         Transform focusedParent = selectedCard.transform.parent;
         Transform crossedParent = cards[index].transform.parent;
@@ -147,10 +141,12 @@ public class HorizontalCardHolder : MonoBehaviour
         cards[index].transform.localPosition = cards[index].selected ? new Vector3(0, cards[index].selectionOffset, 0) : Vector3.zero;
         selectedCard.transform.SetParent(crossedParent);
 
-        isCrossing = false;
 
         if (cards[index].cardVisual == null)
             return;
+
+        // Recalculate the position of the cards
+        // so they stay on top of each other
 
         bool swapIsRight = cards[index].ParentIndex() > selectedCard.ParentIndex();
         cards[index].cardVisual.Swap(swapIsRight ? -1 : 1);
